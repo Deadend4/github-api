@@ -1,29 +1,17 @@
 import express from 'express';
-import GithubChecker from './utils/githubChecker.js';
-import { pool } from './configs/postgres-config.js';
-import { port } from './configs/dotenv.js';
-import getUserAndRepoInsertQuery from './queries/getUserAndRepoInsertQuery.js';
-
+import GithubService from './src/services/github.service.js';
+import { port } from './src/configs/dotenv.config.js';
+import reposRouter from './src/routes/repos.route.js';
+import reposService from './src/services/repos.service.js';
+import pollingRouter from './src/routes/polling.route.js';
 const app = express();
 
-const githubChecker = new GithubChecker();
+const ghService = new GithubService();
+
+app.use('/repos', reposRouter);
+app.use('/polling', pollingRouter);
 
 app.listen(port, () => {
   console.log('Server is listening on port: ', port);
-  githubChecker.start((data) => {
-    const query = data.items.reduce(
-      (acc, item) => acc + getUserAndRepoInsertQuery(item),
-      ''
-    );
-    pool.query(query);
-  }, 2);
-});
-
-app.get('/force-update', (req, res) => {
-  githubChecker.restart();
-  res.status(204).end();
-});
-app.get('/stop', (req, res) => {
-  githubChecker.stop();
-  res.status(204).end();
+  ghService.reposPolling.start(reposService.saveRepos, 5);
 });
