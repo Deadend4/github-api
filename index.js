@@ -1,37 +1,29 @@
-import { Octokit } from 'octokit';
 import express from 'express';
-import dotenv from 'dotenv';
-
-if (process.env.NODE_ENV !== 'production') {
-  dotenv.config();
-}
+import GithubChecker from './utils/githubChecker.js';
+import { pool } from './configs/postgres-config.js';
+import { port } from './configs/dotenv.js';
+import getUserAndRepoInsertQuery from './queries/getUserAndRepoInsertQuery.js';
 
 const app = express();
-const port = process.env.PORT || 3001;
-const authToken = process.env.GITHUB_AUTH_TOKEN || '';
-const octokit = new Octokit({
-  auth: authToken,
-});
+
+const githubChecker = new GithubChecker();
 
 app.listen(port, () => {
   console.log('Server is listening on port: ', port);
-});
-
-app.get('/home', (req, res) => {
-  res.send('Homepage');
-});
-
-app.get('/me', async (req, res) => {
-  try {
-    const result = await octokit.request('GET /users/{username}', {
-      username: 'Deadend4',
-      per_page: 2,
-    });
-
-    res.send(result.data);
-  } catch (error) {
-    console.log(
-      `Error! Status: ${error.status}. Message: ${error.response.data.message}`
+  githubChecker.start((data) => {
+    const query = data.items.reduce(
+      (acc, item) => acc + getUserAndRepoInsertQuery(item),
+      ''
     );
-  }
+    pool.query(query);
+  }, 2);
+});
+
+app.get('/force-update', (req, res) => {
+  githubChecker.restart();
+  res.status(204).end();
+});
+app.get('/stop', (req, res) => {
+  githubChecker.stop();
+  res.status(204).end();
 });

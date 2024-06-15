@@ -1,0 +1,1 @@
+export const MINUTES_TO_MS_MULTIPLIER = 60000;
