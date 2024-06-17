@@ -13,5 +13,5 @@ app.use('/polling', pollingRouter);
 
 app.listen(port, () => {
   console.log('Server is listening on port: ', port);
-  ghService.reposPolling.start(reposService.saveRepos, 5);
+  ghService.reposPolling.start(reposService.saveRepos, 0.25);
 });
