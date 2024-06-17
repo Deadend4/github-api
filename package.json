@@ -5,7 +5,6 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon index.js",
     "migrate": "node-pg-migrate",
     "migrate:create": "node-pg-migrate create"
@@ -14,6 +13,7 @@
   "author": "Deadend4",
   "license": "ISC",
   "dependencies": {
+    "@inquirer/prompts": "^5.0.5",
     "commander": "^12.1.0",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
@@ -26,6 +26,6 @@
     "nodemon": "^3.1.3"
   },
   "bin": {
-    "ghapi": "./cli.js"
+    "ghapi": "./bin/cli.js"
   }
 }
