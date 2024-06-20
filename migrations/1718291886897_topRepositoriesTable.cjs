@@ -10,7 +10,12 @@ exports.shorthands = undefined;
  */
 exports.up = (pgm) => {
   pgm.createTable('users', {
-    id: 'id',
+    id: {
+      type: 'serial',
+      primaryKey: true,
+      unique: true,
+      notNull: true,
+    },
     github_id: { type: 'int', unique: true, notNull: true },
     login: { type: 'varchar(100)', notNull: true },
     url: { type: 'varchar(1000)', notNull: true },
@@ -23,7 +28,12 @@ exports.up = (pgm) => {
   });
 
   pgm.createTable('top_repositories', {
-    id: 'id',
+    id: {
+      type: 'serial',
+      primaryKey: true,
+      unique: true,
+      notNull: true,
+    },
     github_id: { type: 'int', unique: true, notNull: true },
     name: { type: 'varchar(100)', notNull: true },
     url: { type: 'varchar(1000)', notNull: true },
